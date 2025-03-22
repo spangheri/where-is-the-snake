@@ -63,4 +63,4 @@ app.post("/log", (req, res) => {
 // Inicia o servidor
 app.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}`);
-});
+});"// Atualização forçada" 
