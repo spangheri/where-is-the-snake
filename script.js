@@ -84,7 +84,7 @@ function sendDataToBackend(responseTime) {
     };
 
     // Envia os dados para o backend
-    fetch(fetch("https://where-is-the-snake.onrender.com/log", {
+    fetch("https://where-is-the-snake.onrender.com/log", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
