@@ -20,10 +20,10 @@ const rois = [
     { x: 1312, y: 1148, width: 512, height: 540 }
 ];
 
-// ⚡ Verifica se o jogador já jogou
+// ⚡ Verifica se o jogador já jogou e exibe a tela final se necessário
 const JOGADOR_AUTORIZADO = localStorage.getItem("admin") === "true";
 if (!JOGADOR_AUTORIZADO && localStorage.getItem("jogou")) {
-    mostrarTelaFinal();
+    setTimeout(mostrarTelaFinal, 500);
 } else if (!JOGADOR_AUTORIZADO) {
     localStorage.setItem("jogou", "true"); // Marca que o jogador já jogou
 }
@@ -67,9 +67,7 @@ verificarAdmin();
 // 📸 Função que muda para a próxima imagem ou encerra o jogo
 function nextImage() {
     if (currentIndex >= images.length - 1) {
-        setTimeout(() => {
-            mostrarTelaFinal();
-        }, 500); // Delay para suavizar a transição
+        setTimeout(mostrarTelaFinal, 500); // Delay para suavizar a transição
         return;
     }
 
@@ -156,16 +154,16 @@ document.getElementById("game-image").addEventListener("click", function(event) 
     }
 });
 
-// 📌 Função para exibir apenas "Obrigado por jogar!"
+// 📌 Função para exibir apenas "Obrigado por jogar!" mantendo os botões de admin
 function mostrarTelaFinal() {
     document.body.innerHTML = `
         <h1>Obrigado por jogar!</h1>
-        <div id="admin-controls">
+        <div id="admin-controls" style="position: absolute; top: 10px; right: 10px;">
             <button id="admin-login" onclick="pedirSenha()">Entrar como Admin</button>
             <button id="admin-logout" onclick="sairAdmin()" style="display: none;">Sair</button>
         </div>
     `;
-    verificarAdmin(); // Recarrega os botões de admin
+    verificarAdmin(); // Mantém os botões ativos
 }
 
 // Inicializa o jogo
