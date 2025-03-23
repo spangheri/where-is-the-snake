@@ -10,6 +10,8 @@ const images = [
 let currentIndex = 0;
 let startTime;
 let responseTime;
+let timeoutId;
+let intervalId;
 
 // Coordenadas dos ROIs para cada imagem
 const rois = [
@@ -20,12 +22,12 @@ const rois = [
     { x: 1312, y: 1148, width: 512, height: 540 }
 ];
 
-// ⚡ Verifica se o jogador já jogou e exibe a tela final se necessário
+// ⚡ Verifica se o jogador já jogou
 const JOGADOR_AUTORIZADO = localStorage.getItem("admin") === "true";
 if (!JOGADOR_AUTORIZADO && localStorage.getItem("jogou")) {
     setTimeout(mostrarTelaFinal, 500);
 } else if (!JOGADOR_AUTORIZADO) {
-    localStorage.setItem("jogou", "true"); // Marca que o jogador já jogou
+    localStorage.setItem("jogou", "true");
 }
 
 // 🚀 Função para pedir senha e autorizar admin
@@ -62,24 +64,24 @@ function verificarAdmin() {
         botaoLogout.style.display = "none";
     }
 }
-verificarAdmin();
 
 // 📸 Função que muda para a próxima imagem ou encerra o jogo
 function nextImage() {
     if (currentIndex >= images.length - 1) {
-        setTimeout(mostrarTelaFinal, 500); // Delay para suavizar a transição
+        setTimeout(mostrarTelaFinal, 500);
         return;
     }
 
     currentIndex++;
     document.getElementById("game-image").src = images[currentIndex];
-    startTimer();
+    startTimer(); // ✅ Corrigido: Agora o temporizador reinicia corretamente
 }
 
 // ⏳ Função que inicia o temporizador
 function startTimer() {
     let timeLeft = 10;
-    document.getElementById("timer").textContent = `TEMPO RESTANTE: ${timeLeft} SEGUNDOS`;
+    const timerElement = document.getElementById("timer");
+    timerElement.textContent = `TEMPO RESTANTE: ${timeLeft} SEGUNDOS`;
 
     clearTimeout(timeoutId);
     clearInterval(intervalId);
@@ -95,7 +97,7 @@ function startTimer() {
 
     intervalId = setInterval(() => {
         timeLeft--;
-        document.getElementById("timer").textContent = `TEMPO RESTANTE: ${timeLeft} SEGUNDOS`;
+        timerElement.textContent = `TEMPO RESTANTE: ${timeLeft} SEGUNDOS`;
 
         if (timeLeft <= 0) {
             clearInterval(intervalId);
@@ -154,7 +156,7 @@ document.getElementById("game-image").addEventListener("click", function(event) 
     }
 });
 
-// 📌 Função para exibir apenas "Obrigado por jogar!" mantendo os botões de admin
+// 📌 Função para exibir apenas "Obrigado por jogar!" e manter os botões de admin
 function mostrarTelaFinal() {
     document.body.innerHTML = `
         <h1>Obrigado por jogar!</h1>
@@ -166,6 +168,6 @@ function mostrarTelaFinal() {
     verificarAdmin(); // Mantém os botões ativos
 }
 
-// Inicializa o jogo
+// ✅ Inicializa o jogo corretamente
 document.getElementById("game-image").src = images[currentIndex];
 startTimer();
