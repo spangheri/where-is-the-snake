@@ -20,24 +20,24 @@ const rois = [
     { x: 1312, y: 1148, width: 512, height: 540 }
 ];
 
-// ⚡ Verifica se o jogador é admin ou já jogou
+// ⚡ Verifica se o jogador já jogou e não é admin
 const JOGADOR_AUTORIZADO = localStorage.getItem("admin") === "true";
 
 if (!JOGADOR_AUTORIZADO && localStorage.getItem("jogou")) {
     alert("Você já jogou! O jogo só pode ser jogado uma vez.");
     document.getElementById("game-container").innerHTML = "<h1>Obrigado por jogar!</h1>";
 } else if (!JOGADOR_AUTORIZADO) {
-    localStorage.setItem("jogou", "true"); // Marca que o jogador já jogou
+    localStorage.setItem("jogou", "true");
 }
 
 // 🚀 Função para pedir senha e autorizar admin
 function pedirSenha() {
     const senha = prompt("Digite a senha de administrador:");
-    if (senha === "senha_12") { // Altere para sua senha real
+    if (senha === "senha_12") {  // Substitua pela sua senha real
         localStorage.setItem("admin", "true");
         alert("Acesso concedido! Você pode jogar quantas vezes quiser.");
         verificarAdmin();
-        location.reload(); // Recarrega a página para permitir o jogo
+        location.reload(); // Recarrega a página
     } else {
         alert("Senha incorreta!");
     }
