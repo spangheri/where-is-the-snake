@@ -8,8 +8,8 @@ const images = [
 ];
 
 let currentIndex = 0;
-let startTime; // Armazena o tempo inicial
-let responseTime; // Armazena o tempo de resposta
+let startTime;
+let responseTime;
 
 // Coordenadas dos ROIs para cada imagem
 const rois = [
@@ -20,12 +20,20 @@ const rois = [
     { x: 1312, y: 1148, width: 512, height: 540 }
 ];
 
-// Verifica se o jogador já jogou
-if (localStorage.getItem("jogou")) {
+// Verifica se o jogador já jogou e não é o criador
+const JOGADOR_AUTORIZADO = localStorage.getItem("admin") === "true";
+
+if (!JOGADOR_AUTORIZADO && localStorage.getItem("jogou")) {
     alert("Você já jogou! O jogo só pode ser jogado uma vez.");
     document.body.innerHTML = "<h1>Obrigado por jogar!</h1>";
-} else {
+} else if (!JOGADOR_AUTORIZADO) {
     localStorage.setItem("jogou", "true"); // Marca que o jogador já jogou
+}
+
+// Função para autorizar múltiplas jogadas (apenas para o criador)
+function autorizarJogador() {
+    localStorage.setItem("admin", "true");
+    alert("Agora você pode jogar quantas vezes quiser.");
 }
 
 // Seleciona a imagem do jogo
@@ -42,7 +50,7 @@ let intervalId;
 function nextImage() {
     if (currentIndex >= images.length - 1) {
         alert("Fim do jogo! Obrigado por jogar.");
-        document.body.innerHTML = "<h1>Obrigado por jogar!</h1>"; // Remove o jogo da tela
+        document.body.innerHTML = "<h1>Obrigado por jogar!</h1>";
         return;
     }
 
