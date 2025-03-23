@@ -65,18 +65,6 @@ function verificarAdmin() {
     }
 }
 
-// 📸 Função que muda para a próxima imagem ou encerra o jogo
-function nextImage() {
-    if (currentIndex >= images.length - 1) {
-        setTimeout(mostrarTelaFinal, 500);
-        return;
-    }
-
-    currentIndex++;
-    document.getElementById("game-image").src = images[currentIndex];
-    startTimer(); // ✅ Corrigido: Agora o temporizador reinicia corretamente
-}
-
 // ⏳ Função que inicia o temporizador
 function startTimer() {
     let timeLeft = 10;
@@ -86,7 +74,7 @@ function startTimer() {
     clearTimeout(timeoutId);
     clearInterval(intervalId);
 
-    startTime = Date.now();
+    startTime = Date.now(); // ✅ Agora é inicializado corretamente
 
     timeoutId = setTimeout(() => {
         responseTime = 10;
@@ -103,6 +91,18 @@ function startTimer() {
             clearInterval(intervalId);
         }
     }, 1000);
+}
+
+// 📸 Função que muda para a próxima imagem ou encerra o jogo
+function nextImage() {
+    if (currentIndex >= images.length - 1) {
+        setTimeout(mostrarTelaFinal, 500);
+        return;
+    }
+
+    currentIndex++;
+    document.getElementById("game-image").src = images[currentIndex];
+    startTimer(); // ✅ Corrigido: Agora o temporizador reinicia corretamente
 }
 
 // 📡 Função que envia os dados para o backend
@@ -145,8 +145,8 @@ document.getElementById("game-image").addEventListener("click", function(event) 
     const clickY = (event.clientY - rect.top) * scaleY;
 
     if (isClickInROI(clickX, clickY, rois[currentIndex])) {
-        responseTime = (Date.now() - startTime) / 1000;
-        alert(`Você encontrou a cobra em ${responseTime.toFixed(2)} segundos!`);
+        responseTime = ((Date.now() - startTime) / 1000).toFixed(2); // ✅ Agora retorna número válido
+        alert(`Você encontrou a cobra em ${responseTime} segundos!`);
         clearTimeout(timeoutId);
         clearInterval(intervalId);
         sendDataToBackend(responseTime);
