@@ -24,8 +24,13 @@ const rois = [
 const JOGADOR_AUTORIZADO = localStorage.getItem("admin") === "true";
 
 if (!JOGADOR_AUTORIZADO && localStorage.getItem("jogou")) {
-    alert("Você já jogou! O jogo só pode ser jogado uma vez.");
-    document.getElementById("game-container").innerHTML = "<h1>Obrigado por jogar!</h1>";
+    document.body.innerHTML = `
+        <h1>Obrigado por jogar!</h1>
+        <div id="admin-controls">
+            <button id="admin-login" onclick="pedirSenha()">Entrar como Admin</button>
+            <button id="admin-logout" onclick="sairAdmin()" style="display: none;">Sair</button>
+        </div>
+    `;
 } else if (!JOGADOR_AUTORIZADO) {
     localStorage.setItem("jogou", "true"); // Marca que o jogador já jogou
 }
@@ -76,6 +81,27 @@ const timerElement = document.getElementById("timer");
 let timeoutId;
 let intervalId;
 
+// 📸 Função que muda para a próxima imagem ou encerra o jogo
+function nextImage() {
+    if (currentIndex >= images.length - 1) {
+        setTimeout(() => {
+            document.body.innerHTML = `
+                <h1>Obrigado por jogar!</h1>
+                <div id="admin-controls">
+                    <button id="admin-login" onclick="pedirSenha()">Entrar como Admin</button>
+                    <button id="admin-logout" onclick="sairAdmin()" style="display: none;">Sair</button>
+                </div>
+            `;
+            verificarAdmin();
+        }, 500); // Pequeno delay para suavizar a transição
+        return;
+    }
+
+    currentIndex++;
+    gameImage.src = images[currentIndex];
+    startTimer();
+}
+
 // ⏳ Função que inicia o temporizador
 function startTimer() {
     let timeLeft = 10;
@@ -101,19 +127,6 @@ function startTimer() {
             clearInterval(intervalId);
         }
     }, 1000);
-}
-
-// 📸 Função que muda para a próxima imagem ou encerra o jogo
-function nextImage() {
-    if (currentIndex >= images.length - 1) {
-        alert("Fim do jogo! Obrigado por jogar.");
-        document.getElementById("game-container").innerHTML = "<h1>Obrigado por jogar!</h1>";
-        return;
-    }
-
-    currentIndex++;
-    gameImage.src = images[currentIndex];
-    startTimer();
 }
 
 // 🧐 Função que verifica se o clique está dentro do ROI
