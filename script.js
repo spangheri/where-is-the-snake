@@ -8,17 +8,25 @@ const images = [
 ];
 
 let currentIndex = 0;
-let startTime; // Variável para armazenar o tempo inicial
-let responseTime; // Variável para armazenar o tempo de resposta
+let startTime; // Armazena o tempo inicial
+let responseTime; // Armazena o tempo de resposta
 
 // Coordenadas dos ROIs para cada imagem
 const rois = [
-    { x: 1452, y: 1248, width: 324, height: 284 }, // ROI para snake1_0944.JPG
-    { x: 3672, y: 810, width: 1806, height: 1200 }, // ROI para snake2_0997.JPG
-    { x: 2828, y: 2120, width: 952, height: 920 },  // ROI para snake3_1021.JPG
-    { x: 2328, y: 1506, width: 1242, height: 1320 }, // ROI para snake4_1048.JPG
-    { x: 1312, y: 1148, width: 512, height: 540 }   // ROI para snake5_1165.JPG
+    { x: 1452, y: 1248, width: 324, height: 284 },
+    { x: 3672, y: 810, width: 1806, height: 1200 },
+    { x: 2828, y: 2120, width: 952, height: 920 },
+    { x: 2328, y: 1506, width: 1242, height: 1320 },
+    { x: 1312, y: 1148, width: 512, height: 540 }
 ];
+
+// Verifica se o jogador já jogou
+if (localStorage.getItem("jogou")) {
+    alert("Você já jogou! O jogo só pode ser jogado uma vez.");
+    document.body.innerHTML = "<h1>Obrigado por jogar!</h1>";
+} else {
+    localStorage.setItem("jogou", "true"); // Marca que o jogador já jogou
+}
 
 // Seleciona a imagem do jogo
 const gameImage = document.getElementById("game-image");
@@ -30,43 +38,44 @@ const timerElement = document.getElementById("timer");
 let timeoutId;
 let intervalId;
 
-// Função que muda para a próxima imagem
+// Função que muda para a próxima imagem ou encerra o jogo
 function nextImage() {
-    currentIndex = (currentIndex + 1) % images.length;
+    if (currentIndex >= images.length - 1) {
+        alert("Fim do jogo! Obrigado por jogar.");
+        document.body.innerHTML = "<h1>Obrigado por jogar!</h1>"; // Remove o jogo da tela
+        return;
+    }
+
+    currentIndex++;
     gameImage.src = images[currentIndex];
-    startTimer(); // Reinicia o temporizador para a nova imagem
+    startTimer();
 }
 
 // Função que inicia o temporizador
 function startTimer() {
-    let timeLeft = 10; // Tempo inicial: 10 segundos
+    let timeLeft = 10;
     timerElement.textContent = `TEMPO RESTANTE: ${timeLeft} SEGUNDOS`;
 
-    // Limpa o temporizador e o intervalo anteriores (se houver)
     clearTimeout(timeoutId);
     clearInterval(intervalId);
 
-    // Inicia o tempo de resposta
     startTime = Date.now();
 
-    // Temporizador principal (muda a imagem após 10 segundos)
     timeoutId = setTimeout(() => {
-        responseTime = 10; // Tempo esgotado = 10 segundos
-        sendDataToBackend(responseTime); // Envia os dados para o backend
+        responseTime = 10;
+        sendDataToBackend(responseTime);
         alert("Tempo esgotado! Mudando para a próxima imagem.");
         nextImage();
-    }, 10000); // 10000 milissegundos = 10 segundos
+    }, 10000);
 
-    // Atualiza o contador visual a cada segundo
     intervalId = setInterval(() => {
-        timeLeft--; // Diminui o tempo restante
+        timeLeft--;
         timerElement.textContent = `TEMPO RESTANTE: ${timeLeft} SEGUNDOS`;
 
-        // Se o tempo acabar, limpa o intervalo
         if (timeLeft <= 0) {
             clearInterval(intervalId);
         }
-    }, 1000); // Atualiza a cada 1000 milissegundos (1 segundo)
+    }, 1000);
 }
 
 // Função que verifica se o clique está dentro do ROI
@@ -78,12 +87,11 @@ function isClickInROI(clickX, clickY, roi) {
 // Função que envia os dados para o backend
 function sendDataToBackend(responseTime) {
     const data = {
-        ip: "", // O IP será obtido no backend
-        image: images[currentIndex], // Nome da imagem atual
-        responseTime: responseTime // Tempo de resposta
+        ip: "",
+        image: images[currentIndex],
+        responseTime: responseTime
     };
 
-    // Envia os dados para o backend
     fetch("https://where-is-the-snake.onrender.com/log", {
         method: "POST",
         headers: {
@@ -100,7 +108,7 @@ function sendDataToBackend(responseTime) {
     });
 }
 
-// Função que muda a imagem ao clicar
+// Função que trata o clique do jogador
 gameImage.addEventListener("click", function(event) {
     const rect = gameImage.getBoundingClientRect();
     const scaleX = gameImage.naturalWidth / rect.width;
@@ -110,15 +118,14 @@ gameImage.addEventListener("click", function(event) {
     const clickY = (event.clientY - rect.top) * scaleY;
 
     if (isClickInROI(clickX, clickY, rois[currentIndex])) {
-        responseTime = (Date.now() - startTime) / 1000; // Calcula o tempo de resposta em segundos
+        responseTime = (Date.now() - startTime) / 1000;
         alert(`Você encontrou a cobra em ${responseTime.toFixed(2)} segundos!`);
-        clearTimeout(timeoutId); // Cancela o temporizador
-        clearInterval(intervalId); // Cancela a atualização do contador
-        sendDataToBackend(responseTime); // Envia os dados para o backend
-        nextImage(); // Muda para a próxima imagem
+        clearTimeout(timeoutId);
+        clearInterval(intervalId);
+        sendDataToBackend(responseTime);
+        nextImage();
     } else {
-        alert("Tente novamente!"); // Apenas exibe uma mensagem de erro
-        // A imagem NÃO muda, e o jogador pode tentar novamente até o tempo acabar
+        alert("Tente novamente!");
     }
 });
 
