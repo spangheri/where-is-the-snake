@@ -20,17 +20,10 @@ const rois = [
     { x: 1312, y: 1148, width: 512, height: 540 }
 ];
 
-// ⚡ Verifica se o jogador é admin ou já jogou
+// ⚡ Verifica se o jogador já jogou
 const JOGADOR_AUTORIZADO = localStorage.getItem("admin") === "true";
-
 if (!JOGADOR_AUTORIZADO && localStorage.getItem("jogou")) {
-    document.body.innerHTML = `
-        <h1>Obrigado por jogar!</h1>
-        <div id="admin-controls">
-            <button id="admin-login" onclick="pedirSenha()">Entrar como Admin</button>
-            <button id="admin-logout" onclick="sairAdmin()" style="display: none;">Sair</button>
-        </div>
-    `;
+    mostrarTelaFinal();
 } else if (!JOGADOR_AUTORIZADO) {
     localStorage.setItem("jogou", "true"); // Marca que o jogador já jogou
 }
@@ -42,7 +35,7 @@ function pedirSenha() {
         localStorage.setItem("admin", "true");
         alert("Acesso concedido! Você pode jogar quantas vezes quiser.");
         verificarAdmin();
-        location.reload(); // Recarrega a página para permitir o jogo
+        location.reload();
     } else {
         alert("Senha incorreta!");
     }
@@ -53,7 +46,7 @@ function sairAdmin() {
     localStorage.removeItem("admin");
     alert("Você saiu do modo administrador.");
     verificarAdmin();
-    location.reload(); // Recarrega a página
+    location.reload();
 }
 
 // 🔍 Função para mostrar/esconder botões de admin
@@ -69,43 +62,26 @@ function verificarAdmin() {
         botaoLogout.style.display = "none";
     }
 }
-verificarAdmin(); // Inicializa a verificação dos botões
-
-// Seleciona a imagem do jogo
-const gameImage = document.getElementById("game-image");
-
-// Seleciona o elemento do temporizador
-const timerElement = document.getElementById("timer");
-
-// Variáveis para armazenar o temporizador e o intervalo
-let timeoutId;
-let intervalId;
+verificarAdmin();
 
 // 📸 Função que muda para a próxima imagem ou encerra o jogo
 function nextImage() {
     if (currentIndex >= images.length - 1) {
         setTimeout(() => {
-            document.body.innerHTML = `
-                <h1>Obrigado por jogar!</h1>
-                <div id="admin-controls">
-                    <button id="admin-login" onclick="pedirSenha()">Entrar como Admin</button>
-                    <button id="admin-logout" onclick="sairAdmin()" style="display: none;">Sair</button>
-                </div>
-            `;
-            verificarAdmin();
-        }, 500); // Pequeno delay para suavizar a transição
+            mostrarTelaFinal();
+        }, 500); // Delay para suavizar a transição
         return;
     }
 
     currentIndex++;
-    gameImage.src = images[currentIndex];
+    document.getElementById("game-image").src = images[currentIndex];
     startTimer();
 }
 
 // ⏳ Função que inicia o temporizador
 function startTimer() {
     let timeLeft = 10;
-    timerElement.textContent = `TEMPO RESTANTE: ${timeLeft} SEGUNDOS`;
+    document.getElementById("timer").textContent = `TEMPO RESTANTE: ${timeLeft} SEGUNDOS`;
 
     clearTimeout(timeoutId);
     clearInterval(intervalId);
@@ -121,18 +97,12 @@ function startTimer() {
 
     intervalId = setInterval(() => {
         timeLeft--;
-        timerElement.textContent = `TEMPO RESTANTE: ${timeLeft} SEGUNDOS`;
+        document.getElementById("timer").textContent = `TEMPO RESTANTE: ${timeLeft} SEGUNDOS`;
 
         if (timeLeft <= 0) {
             clearInterval(intervalId);
         }
     }, 1000);
-}
-
-// 🧐 Função que verifica se o clique está dentro do ROI
-function isClickInROI(clickX, clickY, roi) {
-    return clickX >= roi.x && clickX <= roi.x + roi.width &&
-           clickY >= roi.y && clickY <= roi.y + roi.height;
 }
 
 // 📡 Função que envia os dados para o backend
@@ -159,11 +129,17 @@ function sendDataToBackend(responseTime) {
     });
 }
 
+// 🎯 Função que verifica se o clique está dentro do ROI
+function isClickInROI(clickX, clickY, roi) {
+    return clickX >= roi.x && clickX <= roi.x + roi.width &&
+           clickY >= roi.y && clickY <= roi.y + roi.height;
+}
+
 // 🖱️ Função que trata o clique do jogador
-gameImage.addEventListener("click", function(event) {
-    const rect = gameImage.getBoundingClientRect();
-    const scaleX = gameImage.naturalWidth / rect.width;
-    const scaleY = gameImage.naturalHeight / rect.height;
+document.getElementById("game-image").addEventListener("click", function(event) {
+    const rect = this.getBoundingClientRect();
+    const scaleX = this.naturalWidth / rect.width;
+    const scaleY = this.naturalHeight / rect.height;
 
     const clickX = (event.clientX - rect.left) * scaleX;
     const clickY = (event.clientY - rect.top) * scaleY;
@@ -180,6 +156,18 @@ gameImage.addEventListener("click", function(event) {
     }
 });
 
-// Inicializa a primeira imagem e o temporizador
-gameImage.src = images[currentIndex];
+// 📌 Função para exibir apenas "Obrigado por jogar!"
+function mostrarTelaFinal() {
+    document.body.innerHTML = `
+        <h1>Obrigado por jogar!</h1>
+        <div id="admin-controls">
+            <button id="admin-login" onclick="pedirSenha()">Entrar como Admin</button>
+            <button id="admin-logout" onclick="sairAdmin()" style="display: none;">Sair</button>
+        </div>
+    `;
+    verificarAdmin(); // Recarrega os botões de admin
+}
+
+// Inicializa o jogo
+document.getElementById("game-image").src = images[currentIndex];
 startTimer();
