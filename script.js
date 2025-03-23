@@ -20,9 +20,8 @@ const rois = [
     { x: 1312, y: 1148, width: 512, height: 540 }
 ];
 
-// Verifica se o jogador já jogou e não é o criador
+// ⚡ Verifica se o jogador é admin ou já jogou
 const JOGADOR_AUTORIZADO = localStorage.getItem("admin") === "true";
-
 if (!JOGADOR_AUTORIZADO && localStorage.getItem("jogou")) {
     alert("Você já jogou! O jogo só pode ser jogado uma vez.");
     document.body.innerHTML = "<h1>Obrigado por jogar!</h1>";
@@ -30,11 +29,40 @@ if (!JOGADOR_AUTORIZADO && localStorage.getItem("jogou")) {
     localStorage.setItem("jogou", "true"); // Marca que o jogador já jogou
 }
 
-// Função para autorizar múltiplas jogadas (apenas para o criador)
-function autorizarJogador() {
-    localStorage.setItem("admin", "true");
-    alert("Agora você pode jogar quantas vezes quiser.");
+// 🚀 Função para pedir senha e autorizar admin
+function pedirSenha() {
+    const senha = prompt("Digite a senha de administrador:");
+    if (senha === "senha_12") { // Altere para sua senha real
+        localStorage.setItem("admin", "true");
+        alert("Acesso concedido! Você pode jogar quantas vezes quiser.");
+        verificarAdmin();
+    } else {
+        alert("Senha incorreta!");
+    }
 }
+
+// 🚪 Função para sair do modo admin
+function sairAdmin() {
+    localStorage.removeItem("admin");
+    alert("Você saiu do modo administrador.");
+    verificarAdmin();
+    location.reload(); // Recarrega a página
+}
+
+// 🔍 Função para mostrar/esconder botões de admin
+function verificarAdmin() {
+    const botaoLogin = document.getElementById("admin-login");
+    const botaoLogout = document.getElementById("admin-logout");
+
+    if (localStorage.getItem("admin") === "true") {
+        botaoLogin.style.display = "none";
+        botaoLogout.style.display = "inline-block";
+    } else {
+        botaoLogin.style.display = "inline-block";
+        botaoLogout.style.display = "none";
+    }
+}
+verificarAdmin(); // Inicializa a verificação dos botões
 
 // Seleciona a imagem do jogo
 const gameImage = document.getElementById("game-image");
@@ -46,20 +74,7 @@ const timerElement = document.getElementById("timer");
 let timeoutId;
 let intervalId;
 
-// Função que muda para a próxima imagem ou encerra o jogo
-function nextImage() {
-    if (currentIndex >= images.length - 1) {
-        alert("Fim do jogo! Obrigado por jogar.");
-        document.body.innerHTML = "<h1>Obrigado por jogar!</h1>";
-        return;
-    }
-
-    currentIndex++;
-    gameImage.src = images[currentIndex];
-    startTimer();
-}
-
-// Função que inicia o temporizador
+// ⏳ Função que inicia o temporizador
 function startTimer() {
     let timeLeft = 10;
     timerElement.textContent = `TEMPO RESTANTE: ${timeLeft} SEGUNDOS`;
@@ -86,13 +101,26 @@ function startTimer() {
     }, 1000);
 }
 
-// Função que verifica se o clique está dentro do ROI
+// 📸 Função que muda para a próxima imagem ou encerra o jogo
+function nextImage() {
+    if (currentIndex >= images.length - 1) {
+        alert("Fim do jogo! Obrigado por jogar.");
+        document.body.innerHTML = "<h1>Obrigado por jogar!</h1>";
+        return;
+    }
+
+    currentIndex++;
+    gameImage.src = images[currentIndex];
+    startTimer();
+}
+
+// 🧐 Função que verifica se o clique está dentro do ROI
 function isClickInROI(clickX, clickY, roi) {
     return clickX >= roi.x && clickX <= roi.x + roi.width &&
            clickY >= roi.y && clickY <= roi.y + roi.height;
 }
 
-// Função que envia os dados para o backend
+// 📡 Função que envia os dados para o backend
 function sendDataToBackend(responseTime) {
     const data = {
         ip: "",
@@ -116,7 +144,7 @@ function sendDataToBackend(responseTime) {
     });
 }
 
-// Função que trata o clique do jogador
+// 🖱️ Função que trata o clique do jogador
 gameImage.addEventListener("click", function(event) {
     const rect = gameImage.getBoundingClientRect();
     const scaleX = gameImage.naturalWidth / rect.width;
