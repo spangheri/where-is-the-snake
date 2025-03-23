@@ -10,8 +10,6 @@ const images = [
 let currentIndex = 0;
 let startTime;
 let responseTime;
-let timeoutId;
-let intervalId;
 
 // Coordenadas dos ROIs para cada imagem
 const rois = [
@@ -22,12 +20,14 @@ const rois = [
     { x: 1312, y: 1148, width: 512, height: 540 }
 ];
 
-// ⚡ Verifica se o jogador já jogou
+// ⚡ Verifica se o jogador é admin ou já jogou
 const JOGADOR_AUTORIZADO = localStorage.getItem("admin") === "true";
+
 if (!JOGADOR_AUTORIZADO && localStorage.getItem("jogou")) {
-    setTimeout(mostrarTelaFinal, 500);
+    alert("Você já jogou! O jogo só pode ser jogado uma vez.");
+    document.getElementById("game-container").innerHTML = "<h1>Obrigado por jogar!</h1>";
 } else if (!JOGADOR_AUTORIZADO) {
-    localStorage.setItem("jogou", "true");
+    localStorage.setItem("jogou", "true"); // Marca que o jogador já jogou
 }
 
 // 🚀 Função para pedir senha e autorizar admin
@@ -37,7 +37,7 @@ function pedirSenha() {
         localStorage.setItem("admin", "true");
         alert("Acesso concedido! Você pode jogar quantas vezes quiser.");
         verificarAdmin();
-        location.reload();
+        location.reload(); // Recarrega a página para permitir o jogo
     } else {
         alert("Senha incorreta!");
     }
@@ -48,7 +48,7 @@ function sairAdmin() {
     localStorage.removeItem("admin");
     alert("Você saiu do modo administrador.");
     verificarAdmin();
-    location.reload();
+    location.reload(); // Recarrega a página
 }
 
 // 🔍 Função para mostrar/esconder botões de admin
@@ -64,17 +64,27 @@ function verificarAdmin() {
         botaoLogout.style.display = "none";
     }
 }
+verificarAdmin(); // Inicializa a verificação dos botões
+
+// Seleciona a imagem do jogo
+const gameImage = document.getElementById("game-image");
+
+// Seleciona o elemento do temporizador
+const timerElement = document.getElementById("timer");
+
+// Variáveis para armazenar o temporizador e o intervalo
+let timeoutId;
+let intervalId;
 
 // ⏳ Função que inicia o temporizador
 function startTimer() {
     let timeLeft = 10;
-    const timerElement = document.getElementById("timer");
     timerElement.textContent = `TEMPO RESTANTE: ${timeLeft} SEGUNDOS`;
 
     clearTimeout(timeoutId);
     clearInterval(intervalId);
 
-    startTime = Date.now(); // ✅ Agora é inicializado corretamente
+    startTime = Date.now();
 
     timeoutId = setTimeout(() => {
         responseTime = 10;
@@ -96,13 +106,20 @@ function startTimer() {
 // 📸 Função que muda para a próxima imagem ou encerra o jogo
 function nextImage() {
     if (currentIndex >= images.length - 1) {
-        setTimeout(mostrarTelaFinal, 500);
+        alert("Fim do jogo! Obrigado por jogar.");
+        document.getElementById("game-container").innerHTML = "<h1>Obrigado por jogar!</h1>";
         return;
     }
 
     currentIndex++;
-    document.getElementById("game-image").src = images[currentIndex];
-    startTimer(); // ✅ Corrigido: Agora o temporizador reinicia corretamente
+    gameImage.src = images[currentIndex];
+    startTimer();
+}
+
+// 🧐 Função que verifica se o clique está dentro do ROI
+function isClickInROI(clickX, clickY, roi) {
+    return clickX >= roi.x && clickX <= roi.x + roi.width &&
+           clickY >= roi.y && clickY <= roi.y + roi.height;
 }
 
 // 📡 Função que envia os dados para o backend
@@ -129,24 +146,18 @@ function sendDataToBackend(responseTime) {
     });
 }
 
-// 🎯 Função que verifica se o clique está dentro do ROI
-function isClickInROI(clickX, clickY, roi) {
-    return clickX >= roi.x && clickX <= roi.x + roi.width &&
-           clickY >= roi.y && clickY <= roi.y + roi.height;
-}
-
 // 🖱️ Função que trata o clique do jogador
-document.getElementById("game-image").addEventListener("click", function(event) {
-    const rect = this.getBoundingClientRect();
-    const scaleX = this.naturalWidth / rect.width;
-    const scaleY = this.naturalHeight / rect.height;
+gameImage.addEventListener("click", function(event) {
+    const rect = gameImage.getBoundingClientRect();
+    const scaleX = gameImage.naturalWidth / rect.width;
+    const scaleY = gameImage.naturalHeight / rect.height;
 
     const clickX = (event.clientX - rect.left) * scaleX;
     const clickY = (event.clientY - rect.top) * scaleY;
 
     if (isClickInROI(clickX, clickY, rois[currentIndex])) {
-        responseTime = ((Date.now() - startTime) / 1000).toFixed(2); // ✅ Agora retorna número válido
-        alert(`Você encontrou a cobra em ${responseTime} segundos!`);
+        responseTime = (Date.now() - startTime) / 1000;
+        alert(`Você encontrou a cobra em ${responseTime.toFixed(2)} segundos!`);
         clearTimeout(timeoutId);
         clearInterval(intervalId);
         sendDataToBackend(responseTime);
@@ -156,18 +167,6 @@ document.getElementById("game-image").addEventListener("click", function(event) 
     }
 });
 
-// 📌 Função para exibir apenas "Obrigado por jogar!" e manter os botões de admin
-function mostrarTelaFinal() {
-    document.body.innerHTML = `
-        <h1>Obrigado por jogar!</h1>
-        <div id="admin-controls" style="position: absolute; top: 10px; right: 10px;">
-            <button id="admin-login" onclick="pedirSenha()">Entrar como Admin</button>
-            <button id="admin-logout" onclick="sairAdmin()" style="display: none;">Sair</button>
-        </div>
-    `;
-    verificarAdmin(); // Mantém os botões ativos
-}
-
-// ✅ Inicializa o jogo corretamente
-document.getElementById("game-image").src = images[currentIndex];
+// Inicializa a primeira imagem e o temporizador
+gameImage.src = images[currentIndex];
 startTimer();
