@@ -15,11 +15,11 @@ let intervalId;
 
 // Coordenadas dos ROIs para cada imagem
 const rois = [
-    { x: 1452, y: 1248, width: 324, height: 284 },
-    { x: 3672, y: 810, width: 1806, height: 1200 },
-    { x: 2828, y: 2120, width: 952, height: 920 },
-    { x: 402, y: 1884, width: 810, height: 936 },
-    { x: 1312, y: 1148, width: 512, height: 540 }
+    { x: 726, y: 624, width: 162, height: 142 }, // ROI para snake1_0944.JPG
+    { x: 1836, y: 405, width: 903, height: 600 }, // ROI para snake2_0997.JPG
+    { x: 1414, y: 1060, width: 476, height: 460 }, // ROI para snake3_1021.JPG
+    { x: 201, y: 942, width: 405, height: 468 },  // ROI para snake4_1048.JPG (corrigido com os novos valores extraídos)
+    { x: 656, y: 574, width: 256, height: 270 }   // ROI para snake5_1165.JPG
 ];
 
 // ⚡ Verifica se o jogador já jogou e não é admin
