@@ -18,7 +18,7 @@ const rois = [
     { x: 1452, y: 1248, width: 324, height: 284 },
     { x: 3672, y: 810, width: 1806, height: 1200 },
     { x: 2828, y: 2120, width: 952, height: 920 },
-    { x: 2328, y: 1506, width: 1242, height: 1320 },
+    { x: 402, y: 1884, width: 810, height: 936 },
     { x: 1312, y: 1148, width: 512, height: 540 }
 ];
 
