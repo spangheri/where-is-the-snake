@@ -15,11 +15,11 @@ let intervalId;
 
 // Coordenadas dos ROIs para cada imagem
 const rois = [
-    { x: 726, y: 624, width: 324, height: 284 },
-    { x: 1836, y: 405, width: 1000, height: 666 },
-    { x: 1414, y: 1060, width: 952, height: 920 },
-    { x: 201, y: 942, width: 810, height: 936 },
-    { x: 656, y: 574, width: 512, height: 540 }
+    { x: 1452, y: 1248, width: 324, height: 284 },  // ROI para snake1_0944.JPG
+    { x: 3672, y: 810, width: 1806, height: 1200 }, // ROI para snake2_0997.JPG (limitando width a 1000)
+    { x: 2828, y: 2120, width: 952, height: 920 }, // ROI para snake3_1021.JPG
+    { x: 2328, y: 1506, width: 1242, height: 1320 },  // ROI para snake4_1048.JPG 
+    { x: 1312, y: 1148, width: 512, height: 540 }   // ROI para snake5_1165.JPG
 ];
 
 // Função para desenhar o ROI na imagem

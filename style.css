@@ -21,17 +21,23 @@ body {
 
 #game-container {
     position: relative;
-    display: inline-block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     max-width: 90%;
+    max-height: 80vh;
     background-color: #333333; /* Fundo do contêiner do jogo em cinza escuro */
     padding: 10px;
     border-radius: 10px; /* Bordas arredondadas */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra mais escura */
+    overflow: hidden;
 }
 
 #game-image {
-    width: 50%; /* Reduzindo para metade do tamanho original */
-    max-width: 1000px; 
+    max-width: 100%; /* Mantém o tamanho original da imagem até o limite do contêiner */
+    max-height: 100%; /* Impede que a imagem ultrapasse os limites verticais */
+    height: auto; /* Mantém a proporção original */
+    width: auto; /* Mantém a proporção original */
     cursor: pointer;
     border: 2px solid #555555; /* Borda em cinza médio */
     border-radius: 8px; /* Bordas arredondadas */
@@ -40,8 +46,9 @@ body {
 
 h1, p {
     color: #ffffff; /* Texto do título e parágrafo em branco */
-	
-}#admin-controls {
+}
+
+#admin-controls {
     position: absolute;
     top: 10px;
     right: 10px;
