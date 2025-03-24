@@ -15,135 +15,44 @@ let intervalId;
 
 // Coordenadas dos ROIs para cada imagem
 const rois = [
-    { x: 726, y: 624, width: 324, height: 284 },  // ROI para snake1_0944.JPG
-    { x: 1836, y: 405, width: 1000, height: 666 }, // ROI para snake2_0997.JPG (limitando width a 1000)
-    { x: 1414, y: 1060, width: 952, height: 920 }, // ROI para snake3_1021.JPG
-    { x: 201, y: 942, width: 810, height: 936 },  // ROI para snake4_1048.JPG 
-    { x: 656, y: 574, width: 512, height: 540 }   // ROI para snake5_1165.JPG
+    { x: 726, y: 624, width: 324, height: 284 },
+    { x: 1836, y: 405, width: 1000, height: 666 },
+    { x: 1414, y: 1060, width: 952, height: 920 },
+    { x: 201, y: 942, width: 810, height: 936 },
+    { x: 656, y: 574, width: 512, height: 540 }
 ];
 
-// ⚡ Verifica se o jogador já jogou e não é admin
-const JOGADOR_AUTORIZADO = localStorage.getItem("admin") === "true";
+// Função para desenhar o ROI na imagem
+function drawROI() {
+    const imageElement = document.getElementById("game-image");
+    const canvas = document.getElementById("roi-canvas");
+    if (!canvas) return;
 
-if (!JOGADOR_AUTORIZADO && localStorage.getItem("jogou")) {
-    mostrarTelaFinal();
-} else if (!JOGADOR_AUTORIZADO) {
-    localStorage.setItem("jogou", "true");
+    const ctx = canvas.getContext("2d");
+    canvas.width = imageElement.width;
+    canvas.height = imageElement.height;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpa o desenho anterior
+
+    const scaleX = imageElement.width / imageElement.naturalWidth;
+    const scaleY = imageElement.height / imageElement.naturalHeight;
+
+    const roi = rois[currentIndex];
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(roi.x * scaleX, roi.y * scaleY, roi.width * scaleX, roi.height * scaleY);
 }
 
-// 🚀 Função para pedir senha e autorizar admin
-function pedirSenha() {
-    const senha = prompt("Digite a senha de administrador:");
-    if (senha === "senha_12") {  // Substitua pela sua senha real
-        localStorage.setItem("admin", "true");
-        alert("Acesso concedido! Você pode jogar quantas vezes quiser.");
-        verificarAdmin();
-        location.reload(); // Recarrega a página
-    } else {
-        alert("Senha incorreta!");
-    }
-}
+// Atualiza o canvas sempre que a imagem carrega
+document.getElementById("game-image").addEventListener("load", drawROI);
 
-// 🚪 Função para sair do modo admin
-function sairAdmin() {
-    localStorage.removeItem("admin");
-    alert("Você saiu do modo administrador.");
-    verificarAdmin();
-    location.reload(); // Recarrega a página
-}
-
-// 🔍 Função para mostrar/esconder botões de admin
-function verificarAdmin() {
-    const botaoLogin = document.getElementById("admin-login");
-    const botaoLogout = document.getElementById("admin-logout");
-
-    if (localStorage.getItem("admin") === "true") {
-        botaoLogin.style.display = "none";
-        botaoLogout.style.display = "inline-block";
-    } else {
-        botaoLogin.style.display = "inline-block";
-        botaoLogout.style.display = "none";
-    }
-}
-verificarAdmin();
-
-// ⏳ Função que inicia o temporizador corretamente
-function startTimer() {
-    let timeLeft = 10;
-    const timerElement = document.getElementById("timer");
-
-    if (!timerElement) {
-        console.error("Elemento #timer não encontrado!");
-        return;
-    }
-
-    timerElement.textContent = `TEMPO RESTANTE: ${timeLeft} SEGUNDOS`;
-
-    clearTimeout(timeoutId);
-    clearInterval(intervalId);
-
-    startTime = Date.now();
-
-    timeoutId = setTimeout(() => {
-        responseTime = 10;
-        sendDataToBackend(responseTime);
-        alert("Tempo esgotado! Mudando para a próxima imagem.");
-        nextImage();
-    }, 10000);
-
-    intervalId = setInterval(() => {
-        timeLeft--;
-        timerElement.textContent = `TEMPO RESTANTE: ${timeLeft} SEGUNDOS`;
-
-        if (timeLeft <= 0) {
-            clearInterval(intervalId);
-        }
-    }, 1000);
-}
-
-// 📸 Função que muda para a próxima imagem ou encerra o jogo
-function nextImage() {
-    if (currentIndex >= images.length - 1) {
-        setTimeout(mostrarTelaFinal, 500);
-        return;
-    }
-
-    currentIndex++;
-    document.getElementById("game-image").src = images[currentIndex];
-    startTimer();
-}
-
-// 📡 Função que envia os dados para o backend
-function sendDataToBackend(responseTime) {
-    const data = {
-        ip: "",
-        image: images[currentIndex],
-        responseTime: responseTime
-    };
-
-    fetch("https://where-is-the-snake.onrender.com/log", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(result => {
-        console.log("Dados enviados com sucesso:", result);
-    })
-    .catch(error => {
-        console.error("Erro ao enviar dados:", error);
-    });
-}
-
-// 🎯 Função que verifica se o clique está dentro do ROI
+// Função que verifica se o clique está dentro do ROI
 function isClickInROI(clickX, clickY, roi) {
     return clickX >= roi.x && clickX <= roi.x + roi.width &&
            clickY >= roi.y && clickY <= roi.y + roi.height;
 }
 
-// 🖱️ Função que trata o clique do jogador
+// Função que trata o clique do jogador
 document.getElementById("game-image").addEventListener("click", function(event) {
     const rect = this.getBoundingClientRect();
     const scaleX = this.naturalWidth / rect.width;
@@ -157,32 +66,41 @@ document.getElementById("game-image").addEventListener("click", function(event) 
         alert(`Você encontrou a cobra em ${responseTime} segundos!`);
         clearTimeout(timeoutId);
         clearInterval(intervalId);
-        sendDataToBackend(responseTime);
         nextImage();
     } else {
         alert("Tente novamente!");
     }
 });
 
-// 📌 Função para exibir apenas "Obrigado por jogar!" e manter os botões de admin
-function mostrarTelaFinal() {
-    document.body.innerHTML = `
-        <h1>Obrigado por jogar!</h1>
-        <div id="admin-controls" style="position: absolute; top: 10px; right: 10px;">
-            <button id="admin-login" onclick="pedirSenha()">Entrar como Admin</button>
-            <button id="admin-logout" onclick="sairAdmin()" style="display: none;">Sair</button>
-        </div>
-    `;
-    verificarAdmin();
+// Função que muda para a próxima imagem ou encerra o jogo
+function nextImage() {
+    if (currentIndex >= images.length - 1) {
+        setTimeout(mostrarTelaFinal, 500);
+        return;
+    }
+
+    currentIndex++;
+    document.getElementById("game-image").src = images[currentIndex];
+    drawROI();
 }
 
-// ✅ Inicializa o jogo corretamente
+// Inicializa o jogo corretamente
 document.addEventListener("DOMContentLoaded", function () {
+    const gameContainer = document.getElementById("game-container");
+
+    // Criar o canvas para os ROIs
+    const canvas = document.createElement("canvas");
+    canvas.id = "roi-canvas";
+    canvas.style.position = "absolute";
+    canvas.style.left = "0";
+    canvas.style.top = "0";
+    canvas.style.pointerEvents = "none"; // Não interfere nos cliques
+    gameContainer.appendChild(canvas);
+
     if (!document.getElementById("game-image")) {
         console.error("Elemento #game-image não encontrado!");
         return;
     }
-    
+
     document.getElementById("game-image").src = images[currentIndex];
-    startTimer();
 });
