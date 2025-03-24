@@ -15,12 +15,12 @@ let intervalId;
 
 // Coordenadas dos ROIs para cada imagem
 const rois = [
-    { x: 726, y: 624, width: 162, height: 142 }, // ROI para snake1_0944.JPG
-    { x: 1836, y: 405, width: 903, height: 600 }, // ROI para snake2_0997.JPG
-    { x: 1414, y: 1060, width: 476, height: 460 }, // ROI para snake3_1021.JPG
-    { x: 201, y: 942, width: 405, height: 468 },  // ROI para snake4_1048.JPG (corrigido com os novos valores extraídos)
-    { x: 656, y: 574, width: 256, height: 270 }   // ROI para snake5_1165.JPG
-];
+    { x: Math.round(726 * 0.6), y: Math.round(624 * 0.6), width: Math.round(162 * 0.6), height: Math.round(142 * 0.6) }, // ROI para snake1_0944.JPG
+    { x: Math.round(1836 * 0.6), y: Math.round(405 * 0.6), width: Math.round(903 * 0.6), height: Math.round(600 * 0.6) }, // ROI para snake2_0997.JPG
+    { x: Math.round(1414 * 0.6), y: Math.round(1060 * 0.6), width: Math.round(476 * 0.6), height: Math.round(460 * 0.6) }, // ROI para snake3_1021.JPG
+    { x: Math.round(201 * 0.6), y: Math.round(942 * 0.6), width: Math.round(405 * 0.6), height: Math.round(468 * 0.6) }, // ROI para snake4_1048.JPG
+    { x: Math.round(656 * 0.6), y: Math.round(574 * 0.6), width: Math.round(256 * 0.6), height: Math.round(270 * 0.6) } // ROI para snake5_1165.JPG
+]; 
 
 // ⚡ Verifica se o jogador já jogou e não é admin
 const JOGADOR_AUTORIZADO = localStorage.getItem("admin") === "true";
