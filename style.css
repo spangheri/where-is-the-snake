@@ -31,7 +31,7 @@ body {
 
 #game-image {
     width: 50%; /* Reduzindo para metade do tamanho original */
-    max-width: 500px; /* Antes era 1000px, agora metade */
+    max-width: 1000px; 
     cursor: pointer;
     border: 2px solid #555555; /* Borda em cinza médio */
     border-radius: 8px; /* Bordas arredondadas */
