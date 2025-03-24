@@ -1,10 +1,20 @@
 const express = require("express");
-const { Parser } = require("json2csv");
-const fs = require("fs");
-const path = require("path");
+const { Pool } = require("pg");
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+// Configuração do banco de dados PostgreSQL
+const pool = new Pool({
+    user: process.env.DB_USER || "where_is_the_snake_db_user",
+    host: process.env.DB_HOST || "dpg-cvgpmprtq21c73c0n29g-a.oregon-postgres.render.com",
+    database: process.env.DB_NAME || "where_is_the_snake_db",
+    password: process.env.DB_PASSWORD || "0sIyM3cecU57w9nPBDX8PecM7bhtBf3U",
+    port: process.env.DB_PORT || 5432,
+    ssl: {
+        rejectUnauthorized: false
+    }
+});
 
 // Middleware para permitir requisições de qualquer origem (CORS)
 app.use((req, res, next) => {
@@ -16,51 +26,26 @@ app.use((req, res, next) => {
 // Middleware para processar JSON
 app.use(express.json());
 
-// Array para armazenar os dados (simulando um data frame)
-let dataFrame = [];
-
-// Função para salvar os dados em um arquivo CSV
-function saveToCSV() {
-    const fields = ["ip", "image", "responseTime", "timestamp"]; // Campos do CSV
-    const opts = { fields };
+// Rota para receber os dados do frontend e salvar no PostgreSQL
+app.post("/log", async (req, res) => {
+    const { image, responseTime } = req.body;
+    const ip = req.ip || req.connecatualizetion.remoteAddress;
+    const timestamp = new Date().toISOString();
 
     try {
-        const parser = new Parser(opts);
-        const csv = parser.parse(dataFrame);
-
-        // Caminho do arquivo CSV
-        const filePath = path.join(__dirname, "data.csv");
-
-        // Salva o arquivo CSV
-        fs.writeFileSync(filePath, csv);
-        console.log("Dados salvos em data.csv");
+        const query = `
+            INSERT INTO game_data (ip, image, response_time, timestamp)
+            VALUES ($1, $2, $3, $4)
+        `;
+        await pool.query(query, [ip, image, responseTime, timestamp]);
+        res.json({ success: true, message: "Dados armazenados no banco de dados!" });
     } catch (err) {
-        console.error("Erro ao gerar CSV:", err);
+        console.error("Erro ao salvar no banco:", err);
+        res.status(500).json({ success: false, message: "Erro ao salvar no banco." });
     }
-}
-
-// Rota para receber os dados do frontend
-app.post("/log", (req, res) => {
-    const data = req.body;
-
-    // Obtém o IP do jogador
-    const ip = req.ip || req.connection.remoteAddress;
-
-    // Adiciona o IP, o timestamp e a data/hora aos dados
-    data.ip = ip;
-    data.timestamp = new Date().toISOString(); // Data e hora no formato ISO
-
-    // Adiciona os dados ao array (data frame)
-    dataFrame.push(data);
-
-    // Salva os dados em um arquivo CSV
-    saveToCSV();
-
-    // Resposta para o frontend
-    res.json({ success: true, message: "Dados recebidos com sucesso!" });
 });
 
 // Inicia o servidor
 app.listen(port, () => {
-    console.log(`Servidor rodando na porta ${port}`); 
-});"// Atualização forçada" 
+    console.log(`Servidor rodando na porta ${port}`);
+});
