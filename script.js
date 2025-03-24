@@ -37,27 +37,25 @@ function startTimer() {
 function drawROI() {
     const imageElement = document.getElementById("game-image");
     const canvas = document.getElementById("roi-canvas");
-    if (!canvas || !imageElement.complete) return;
+    if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
+    canvas.width = imageElement.width;
+    canvas.height = imageElement.height;
 
-    // Ajustar o canvas para o tamanho da imagem visível
-    canvas.width = imageElement.clientWidth;
-    canvas.height = imageElement.clientHeight;
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpa o desenho anterior
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height); 
-
-    const scaleX = canvas.width / imageElement.naturalWidth;
-    const scaleY = canvas.height / imageElement.naturalHeight;
+    // Calcular escala entre tamanho original e tamanho exibido
+    const scaleX = imageElement.width / imageElement.naturalWidth;
+    const scaleY = imageElement.height / imageElement.naturalHeight;
 
     const roi = rois[currentIndex];
-
     ctx.strokeStyle = "red";
     ctx.lineWidth = 2;
     ctx.strokeRect(roi.x * scaleX, roi.y * scaleY, roi.width * scaleX, roi.height * scaleY);
 }
 
-// Atualiza o canvas sempre que a imagem carrega
+// Atualiza o canvas sempre que a imagem carregar
 document.getElementById("game-image").addEventListener("load", drawROI);
 
 // Função que verifica se o clique está dentro do ROI

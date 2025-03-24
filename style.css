@@ -16,7 +16,7 @@ body {
     font-size: 24px;
     font-weight: bold;
     margin-bottom: 20px;
-    color: #ffffff; /* Texto do temporizador em branco */
+    color: red; /* Texto do temporizador em branco */
 }
 
 #game-container {
@@ -34,15 +34,11 @@ body {
 }
 
 #game-image {
-    max-width: 100%; /* Mantém o tamanho original da imagem até o limite do contêiner */
-    max-height: 100%; /* Impede que a imagem ultrapasse os limites verticais */
-    height: auto; /* Mantém a proporção original */
-    width: auto; /* Mantém a proporção original */
-    cursor: pointer;
-    border: 2px solid #555555; /* Borda em cinza médio */
-    border-radius: 8px; /* Bordas arredondadas */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra mais escura */
+    width: 60%; /* Reduzindo o tamanho */
+    max-width: 800px; /* Tamanho máximo */
+    height: auto; /* Mantém a proporção */
 }
+
 
 h1, p {
     color: #ffffff; /* Texto do título e parágrafo em branco */
