@@ -15,29 +15,43 @@ let intervalId;
 
 // Coordenadas dos ROIs para cada imagem
 const rois = [
-    { x: 1452, y: 1248, width: 324, height: 284 },  // ROI para snake1_0944.JPG
-    { x: 3672, y: 810, width: 1806, height: 1200 }, // ROI para snake2_0997.JPG (limitando width a 1000)
-    { x: 2828, y: 2120, width: 952, height: 920 }, // ROI para snake3_1021.JPG
-    { x: 2328, y: 1506, width: 1242, height: 1320 },  // ROI para snake4_1048.JPG 
-    { x: 1312, y: 1148, width: 512, height: 540 }   // ROI para snake5_1165.JPG
+    { x: 1452, y: 1248, width: 324, height: 284 },  
+    { x: 3672, y: 810, width: 1806, height: 1200 }, 
+    { x: 2828, y: 2120, width: 952, height: 920 },  
+    { x: 2328, y: 1506, width: 1242, height: 1320 },  
+    { x: 1312, y: 1148, width: 512, height: 540 }  
 ];
+
+// Função para iniciar o timer
+function startTimer() {
+    clearInterval(intervalId);
+    startTime = Date.now();
+    
+    intervalId = setInterval(() => {
+        const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
+        document.getElementById("timer").innerText = `Tempo: ${elapsedTime} s`;
+    }, 100);
+}
 
 // Função para desenhar o ROI na imagem
 function drawROI() {
     const imageElement = document.getElementById("game-image");
     const canvas = document.getElementById("roi-canvas");
-    if (!canvas) return;
+    if (!canvas || !imageElement.complete) return;
 
     const ctx = canvas.getContext("2d");
-    canvas.width = imageElement.width;
-    canvas.height = imageElement.height;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpa o desenho anterior
+    // Ajustar o canvas para o tamanho da imagem visível
+    canvas.width = imageElement.clientWidth;
+    canvas.height = imageElement.clientHeight;
 
-    const scaleX = imageElement.width / imageElement.naturalWidth;
-    const scaleY = imageElement.height / imageElement.naturalHeight;
+    ctx.clearRect(0, 0, canvas.width, canvas.height); 
+
+    const scaleX = canvas.width / imageElement.naturalWidth;
+    const scaleY = canvas.height / imageElement.naturalHeight;
 
     const roi = rois[currentIndex];
+
     ctx.strokeStyle = "red";
     ctx.lineWidth = 2;
     ctx.strokeRect(roi.x * scaleX, roi.y * scaleY, roi.width * scaleX, roi.height * scaleY);
@@ -81,7 +95,7 @@ function nextImage() {
 
     currentIndex++;
     document.getElementById("game-image").src = images[currentIndex];
-    drawROI();
+    startTimer();
 }
 
 // Inicializa o jogo corretamente
@@ -103,4 +117,5 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     document.getElementById("game-image").src = images[currentIndex];
+    startTimer();
 });
