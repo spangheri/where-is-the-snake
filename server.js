@@ -1,5 +1,6 @@
 const express = require("express");
 const { Pool } = require("pg");
+const cors = require("cors");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -11,37 +12,52 @@ const pool = new Pool({
     database: process.env.DB_NAME || "where_is_the_snake_db",
     password: process.env.DB_PASSWORD || "0sIyM3cecU57w9nPBDX8PecM7bhtBf3U",
     port: process.env.DB_PORT || 5432,
-    ssl: {
-        rejectUnauthorized: false
-    }
+    ssl: { rejectUnauthorized: false } // Necessário para conexão segura no Render
 });
 
-// Middleware para permitir requisições de qualquer origem (CORS)
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Content-Type");
-    next();
-});
-
-// Middleware para processar JSON
+// Middleware
+app.use(cors());
 app.use(express.json());
 
-// Rota para receber os dados do frontend e salvar no PostgreSQL
-app.post("/log", async (req, res) => {
-    const { image, responseTime } = req.body;
-    const ip = req.ip || req.connecatualizetion.remoteAddress;
-    const timestamp = new Date().toISOString();
-
+// Criar a tabela se não existir
+async function createTable() {
+    const query = `
+        CREATE TABLE IF NOT EXISTS game_data (
+            id SERIAL PRIMARY KEY,
+            ip VARCHAR(50),
+            image VARCHAR(255),
+            response_time FLOAT,
+            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `;
     try {
+        await pool.query(query);
+        console.log("Tabela verificada/criada com sucesso.");
+    } catch (error) {
+        console.error("Erro ao criar a tabela:", error);
+    }
+}
+createTable();
+
+// Rota para receber os dados do frontend
+app.post("/log", async (req, res) => {
+    try {
+        const { image, responseTime } = req.body;
+        const ip = req.ip || req.connection.remoteAddress;
+        const timestamp = new Date();
+
         const query = `
             INSERT INTO game_data (ip, image, response_time, timestamp)
             VALUES ($1, $2, $3, $4)
+            RETURNING *
         `;
-        await pool.query(query, [ip, image, responseTime, timestamp]);
-        res.json({ success: true, message: "Dados armazenados no banco de dados!" });
-    } catch (err) {
-        console.error("Erro ao salvar no banco:", err);
-        res.status(500).json({ success: false, message: "Erro ao salvar no banco." });
+        const values = [ip, image, responseTime, timestamp];
+
+        const result = await pool.query(query, values);
+        res.json({ success: true, data: result.rows[0] });
+    } catch (error) {
+        console.error("Erro ao inserir dados:", error);
+        res.status(500).json({ success: false, message: "Erro ao salvar os dados" });
     }
 });
 
