@@ -75,15 +75,6 @@ function nextImage() {
 document.addEventListener("DOMContentLoaded", function () {
     const gameContainer = document.getElementById("game-container");
 
-    // Criar o canvas para os ROIs
-    const canvas = document.createElement("canvas");
-    canvas.id = "roi-canvas";
-    canvas.style.position = "absolute";
-    canvas.style.left = "0";
-    canvas.style.top = "0";
-    canvas.style.pointerEvents = "none"; // Não interfere nos cliques
-    gameContainer.appendChild(canvas);
-
     if (!document.getElementById("game-image")) {
         console.error("Elemento #game-image não encontrado!");
         return;
