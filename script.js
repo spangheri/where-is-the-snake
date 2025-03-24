@@ -8,10 +8,8 @@ const images = [
 ];
 
 let currentIndex = 0;
-let startTime;
-let responseTime;
-let timeoutId;
-let intervalId;
+let timer;
+let countdown;
 
 // Coordenadas dos ROIs para cada imagem
 const rois = [
@@ -22,15 +20,21 @@ const rois = [
     { x: 1312, y: 1148, width: 512, height: 540 }  
 ];
 
-// Função para iniciar o timer
+// Função para iniciar o timer de 10s
 function startTimer() {
-    clearInterval(intervalId);
-    startTime = Date.now();
-    
-    intervalId = setInterval(() => {
-        const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
-        document.getElementById("timer").innerText = `Tempo: ${elapsedTime} s`;
-    }, 100);
+    clearInterval(timer);
+    let timeLeft = 10;
+    document.getElementById("timer").innerText = `Tempo: ${timeLeft}s`;
+
+    timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").innerText = `Tempo: ${timeLeft}s`;
+
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            nextImage();
+        }
+    }, 1000);
 }
 
 // Função que verifica se o clique está dentro do ROI
@@ -49,20 +53,18 @@ document.getElementById("game-image").addEventListener("click", function(event) 
     const clickY = (event.clientY - rect.top) * scaleY;
 
     if (isClickInROI(clickX, clickY, rois[currentIndex])) {
-        responseTime = ((Date.now() - startTime) / 1000).toFixed(2);
-        alert(`Você encontrou a cobra em ${responseTime} segundos!`);
-        clearTimeout(timeoutId);
-        clearInterval(intervalId);
+        alert(`Você encontrou a cobra!`);
+        clearInterval(timer);
         nextImage();
     } else {
         alert("Tente novamente!");
     }
 });
 
-// Função que muda para a próxima imagem ou encerra o jogo
+// Função que muda para a próxima imagem ou exibe a tela final
 function nextImage() {
     if (currentIndex >= images.length - 1) {
-        setTimeout(mostrarTelaFinal, 500);
+        mostrarTelaFinal();
         return;
     }
 
@@ -71,10 +73,19 @@ function nextImage() {
     startTimer();
 }
 
+// Função para exibir a tela final
+function mostrarTelaFinal() {
+    document.getElementById("game-image").style.display = "none";
+    document.getElementById("timer").style.display = "none";
+
+    const gameContainer = document.getElementById("game-container");
+    const message = document.createElement("h2");
+    message.innerText = "Fim do jogo! Muito obrigado pela sua participação!";
+    gameContainer.appendChild(message);
+}
+
 // Inicializa o jogo corretamente
 document.addEventListener("DOMContentLoaded", function () {
-    const gameContainer = document.getElementById("game-container");
-
     if (!document.getElementById("game-image")) {
         console.error("Elemento #game-image não encontrado!");
         return;
