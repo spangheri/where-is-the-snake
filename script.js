@@ -9,7 +9,6 @@ const images = [
 
 let currentIndex = 0;
 let timer;
-let countdown;
 
 // Coordenadas dos ROIs para cada imagem
 const rois = [
@@ -78,9 +77,18 @@ function mostrarTelaFinal() {
     document.getElementById("game-image").style.display = "none";
     document.getElementById("timer").style.display = "none";
 
+    // Esconde mensagens extras
+    document.getElementById("brightness-warning").style.display = "none";
+    document.getElementById("game-title").style.display = "none";
+
+    // Exibe a mensagem final de agradecimento
     const gameContainer = document.getElementById("game-container");
+    gameContainer.innerHTML = "";  // Limpa tudo dentro do container
     const message = document.createElement("h2");
     message.innerText = "Fim do jogo! Muito obrigado pela sua participação!";
+    message.style.textAlign = "center";
+    message.style.fontSize = "24px";
+    message.style.color = "#000";
     gameContainer.appendChild(message);
 }
 

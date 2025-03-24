@@ -20,26 +20,27 @@ body {
 }
 
 #game-container {
-    position: relative;
+    background: none !important; /* Remove fundo cinza */
+    border: none !important; /* Remove borda */
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    max-width: 90%;
-    max-height: 80vh;
-    background-color: #333333; /* Fundo do contêiner do jogo em cinza escuro */
-    padding: 10px;
-    border-radius: 10px; /* Bordas arredondadas */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra mais escura */
-    overflow: hidden;
+    justify-content: center;
 }
 
 #game-image {
-    width: 60%; /* Reduzindo o tamanho */
-    max-width: 800px; /* Tamanho máximo */
-    height: auto; /* Mantém a proporção */
+    width: 60%;
+    max-width: 800px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
 }
 
 
+h2 {
+    background: none;
+    border: none;
+}
 h1, p {
     color: #ffffff; /* Texto do título e parágrafo em branco */
 }
