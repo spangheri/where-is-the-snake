@@ -113,38 +113,3 @@ function mostrarTelaFinal() {
     document.getElementById("final-message").style.display = "block";
 }
 
-// Função para pedir senha do Admin
-function pedirSenha() {
-    const senha = prompt("Digite a senha de administrador:");
-    
-    if (senha === "senha_12") { // Altere essa senha conforme necessário
-        isAdmin = true;
-        localStorage.setItem("isAdmin", "true");
-
-        document.getElementById("admin-login").style.display = "none";
-        document.getElementById("admin-logout").style.display = "block";
-        localStorage.removeItem("hasPlayed"); // Permite que o admin jogue sempre
-        alert("Modo Admin ativado!");
-    } else {
-        alert("Senha incorreta!");
-    }
-}
-
-// Função para sair do modo Admin
-function sairAdmin() {
-    isAdmin = false;
-    localStorage.removeItem("isAdmin");
-
-    document.getElementById("admin-login").style.display = "block";
-    document.getElementById("admin-logout").style.display = "none";
-    alert("Você saiu do modo Admin!");
-}
-
-// Verifica se o Admin já está logado ao carregar a página
-document.addEventListener("DOMContentLoaded", function () {
-    if (localStorage.getItem("isAdmin") === "true") {
-        isAdmin = true;
-        document.getElementById("admin-login").style.display = "none";
-        document.getElementById("admin-logout").style.display = "block";
-    }
-});
