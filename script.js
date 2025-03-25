@@ -106,11 +106,17 @@ function nextImage() {
 function mostrarTelaFinal() {
     const gameImage = document.getElementById("game-image");
     const timerElement = document.getElementById("timer");
+    const brightnessWarning = document.getElementById("brightness-warning");
+    const gameTitle = document.getElementById("game-title");
     const gameContainer = document.getElementById("game-container");
 
+    // Esconder/remover elementos indesejados
     if (gameImage) gameImage.style.display = "none";
     if (timerElement) timerElement.style.display = "none";
+    if (brightnessWarning) brightnessWarning.remove(); // Remove completamente do DOM
+    if (gameTitle) gameTitle.remove(); // Remove completamente do DOM
 
+    // Limpar o conteúdo do gameContainer e adicionar a mensagem final
     if (gameContainer) {
         gameContainer.innerHTML = ""; // Limpa tudo dentro do container
         const message = document.createElement("h2");
@@ -122,11 +128,8 @@ function mostrarTelaFinal() {
     } else {
         console.error("Elemento #game-container não encontrado!");
     }
-
-    if (!isAdmin) {
-        localStorage.setItem("hasPlayed", "true"); // Bloqueia jogador normal após uma partida
-    }
 }
+
 
 // Função para pedir senha do Admin
 function pedirSenha() {
