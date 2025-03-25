@@ -109,10 +109,7 @@ function mostrarTelaFinal() {
     if (gameContainer) {
         gameContainer.innerHTML = ""; // Limpa tudo dentro do container
         const message = document.createElement("h2");
-        message.innerText = "Fim do jogo! Muito obrigado pela sua participação!";
-        message.style.textAlign = "center";
-        message.style.fontSize = "24px";
-        message.style.color = "#000";
+        message.innerText = ""; // Mensagem final deixada em branco
         gameContainer.appendChild(message);
     } else {
         console.error("Elemento #game-container não encontrado!");
