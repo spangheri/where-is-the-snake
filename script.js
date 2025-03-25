@@ -23,11 +23,17 @@ const rois = [
 function startTimer() {
     clearInterval(timer);
     let timeLeft = 10;
-    document.getElementById("timer").innerText = `Tempo: ${timeLeft}s`;
+
+    const timerElement = document.getElementById("timer");
+    if (timerElement) {
+        timerElement.innerText = `Tempo: ${timeLeft}s`;
+    }
 
     timer = setInterval(() => {
         timeLeft--;
-        document.getElementById("timer").innerText = `Tempo: ${timeLeft}s`;
+        if (timerElement) {
+            timerElement.innerText = `Tempo: ${timeLeft}s`;
+        }
 
         if (timeLeft <= 0) {
             clearInterval(timer);
@@ -43,21 +49,33 @@ function isClickInROI(clickX, clickY, roi) {
 }
 
 // Função que trata o clique do jogador
-document.getElementById("game-image").addEventListener("click", function(event) {
-    const rect = this.getBoundingClientRect();
-    const scaleX = this.naturalWidth / rect.width;
-    const scaleY = this.naturalHeight / rect.height;
-
-    const clickX = (event.clientX - rect.left) * scaleX;
-    const clickY = (event.clientY - rect.top) * scaleY;
-
-    if (isClickInROI(clickX, clickY, rois[currentIndex])) {
-        alert(`Você encontrou a cobra!`);
-        clearInterval(timer);
-        nextImage();
-    } else {
-        alert("Tente novamente!");
+document.addEventListener("DOMContentLoaded", function () {
+    const gameImage = document.getElementById("game-image");
+    if (!gameImage) {
+        console.error("Elemento #game-image não encontrado!");
+        return;
     }
+
+    gameImage.addEventListener("click", function (event) {
+        const rect = this.getBoundingClientRect();
+        const scaleX = this.naturalWidth / rect.width;
+        const scaleY = this.naturalHeight / rect.height;
+
+        const clickX = (event.clientX - rect.left) * scaleX;
+        const clickY = (event.clientY - rect.top) * scaleY;
+
+        if (isClickInROI(clickX, clickY, rois[currentIndex])) {
+            alert(`Você encontrou a cobra!`);
+            clearInterval(timer);
+            nextImage();
+        } else {
+            alert("Tente novamente!");
+        }
+    });
+
+    // Inicializa o jogo corretamente
+    gameImage.src = images[currentIndex];
+    startTimer();
 });
 
 // Função que muda para a próxima imagem ou exibe a tela final
@@ -68,37 +86,35 @@ function nextImage() {
     }
 
     currentIndex++;
-    document.getElementById("game-image").src = images[currentIndex];
+    const gameImage = document.getElementById("game-image");
+    if (gameImage) {
+        gameImage.src = images[currentIndex];
+    }
     startTimer();
 }
 
 // Função para exibir a tela final
 function mostrarTelaFinal() {
-    document.getElementById("game-image").style.display = "none";
-    document.getElementById("timer").style.display = "none";
-
-    // Esconde mensagens extras
-    document.getElementById("brightness-warning").style.display = "none";
-    document.getElementById("game-title").style.display = "none";
-
-    // Exibe a mensagem final de agradecimento
+    const gameImage = document.getElementById("game-image");
+    const timerElement = document.getElementById("timer");
+    const brightnessWarning = document.getElementById("brightness-warning");
+    const gameTitle = document.getElementById("game-title");
     const gameContainer = document.getElementById("game-container");
-    gameContainer.innerHTML = "";  // Limpa tudo dentro do container
-    const message = document.createElement("h2");
-    message.innerText = "Fim do jogo! Muito obrigado pela sua participação!";
-    message.style.textAlign = "center";
-    message.style.fontSize = "24px";
-    message.style.color = "#000";
-    gameContainer.appendChild(message);
-}
 
-// Inicializa o jogo corretamente
-document.addEventListener("DOMContentLoaded", function () {
-    if (!document.getElementById("game-image")) {
-        console.error("Elemento #game-image não encontrado!");
-        return;
+    if (gameImage) gameImage.style.display = "none";
+    if (timerElement) timerElement.style.display = "none";
+    if (brightnessWarning) brightnessWarning.style.display = "none";
+    if (gameTitle) gameTitle.style.display = "none";
+
+    if (gameContainer) {
+        gameContainer.innerHTML = ""; // Limpa tudo dentro do container
+        const message = document.createElement("h2");
+        message.innerText = "Fim do jogo! Muito obrigado pela sua participação!";
+        message.style.textAlign = "center";
+        message.style.fontSize = "24px";
+        message.style.color = "#000";
+        gameContainer.appendChild(message);
+    } else {
+        console.error("Elemento #game-container não encontrado!");
     }
-
-    document.getElementById("game-image").src = images[currentIndex];
-    startTimer();
-});
+}
