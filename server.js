@@ -42,8 +42,6 @@ createTable();
 // Rota para receber múltiplos dados do frontend
 app.post("/log", async (req, res) => {
     try {
-        console.log("Dados recebidos:", req.body);  // <-- Adicionamos este log para depuração
-
         const { images } = req.body;
         const ip = req.ip || req.connection.remoteAddress;
         const timestamp = new Date();
@@ -51,6 +49,8 @@ app.post("/log", async (req, res) => {
         if (!Array.isArray(images) || images.length === 0) {
             return res.status(400).json({ success: false, message: "Formato inválido. Esperado um array de imagens." });
         }
+
+        console.log("Recebendo imagens:", images); // Debug
 
         const queries = images.map(({ image, responseTime }) =>
             pool.query(
@@ -67,7 +67,6 @@ app.post("/log", async (req, res) => {
         res.status(500).json({ success: false, message: "Erro ao salvar os dados" });
     }
 });
-
 // Inicia o servidor
 app.listen(port, () => {
     console.log(`Servidor rodando na porta ${port}`);
