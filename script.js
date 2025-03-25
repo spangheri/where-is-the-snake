@@ -9,6 +9,8 @@ const images = [
 
 let currentIndex = 0;
 let timer;
+let isAdmin = false;
+let hasPlayed = localStorage.getItem("hasPlayed") === "true"; // Impede jogadores normais de jogar mais de uma vez
 
 // Coordenadas dos ROIs para cada imagem
 const rois = [
@@ -51,8 +53,15 @@ function isClickInROI(clickX, clickY, roi) {
 // Função que trata o clique do jogador
 document.addEventListener("DOMContentLoaded", function () {
     const gameImage = document.getElementById("game-image");
+
     if (!gameImage) {
         console.error("Elemento #game-image não encontrado!");
+        return;
+    }
+
+    // Impede que jogadores normais joguem mais de uma vez
+    if (hasPlayed && !isAdmin) {
+        mostrarTelaFinal();
         return;
     }
 
@@ -97,14 +106,10 @@ function nextImage() {
 function mostrarTelaFinal() {
     const gameImage = document.getElementById("game-image");
     const timerElement = document.getElementById("timer");
-    const brightnessWarning = document.getElementById("brightness-warning");
-    const gameTitle = document.getElementById("game-title");
     const gameContainer = document.getElementById("game-container");
 
     if (gameImage) gameImage.style.display = "none";
     if (timerElement) timerElement.style.display = "none";
-    if (brightnessWarning) brightnessWarning.style.display = "none";
-    if (gameTitle) gameTitle.style.display = "none";
 
     if (gameContainer) {
         gameContainer.innerHTML = ""; // Limpa tudo dentro do container
@@ -117,5 +122,44 @@ function mostrarTelaFinal() {
     } else {
         console.error("Elemento #game-container não encontrado!");
     }
+
+    if (!isAdmin) {
+        localStorage.setItem("hasPlayed", "true"); // Bloqueia jogador normal após uma partida
+    }
 }
 
+// Função para pedir senha do Admin
+function pedirSenha() {
+    const senha = prompt("Digite a senha de administrador:");
+    
+    if (senha === "senha_12") { // Altere essa senha conforme necessário
+        isAdmin = true;
+        localStorage.setItem("isAdmin", "true");
+
+        document.getElementById("admin-login").style.display = "none";
+        document.getElementById("admin-logout").style.display = "block";
+        localStorage.removeItem("hasPlayed"); // Permite que o admin jogue sempre
+        alert("Modo Admin ativado!");
+    } else {
+        alert("Senha incorreta!");
+    }
+}
+
+// Função para sair do modo Admin
+function sairAdmin() {
+    isAdmin = false;
+    localStorage.removeItem("isAdmin");
+
+    document.getElementById("admin-login").style.display = "block";
+    document.getElementById("admin-logout").style.display = "none";
+    alert("Você saiu do modo Admin!");
+}
+
+// Verifica se o Admin já está logado ao carregar a página
+document.addEventListener("DOMContentLoaded", function () {
+    if (localStorage.getItem("isAdmin") === "true") {
+        isAdmin = true;
+        document.getElementById("admin-login").style.display = "none";
+        document.getElementById("admin-logout").style.display = "block";
+    }
+});
