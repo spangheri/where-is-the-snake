@@ -27,7 +27,7 @@ async function createTable() {
             ip VARCHAR(50),
             image VARCHAR(255),
             response_time FLOAT,
-            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            timestamp TIMESTAMP DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'America/Sao_Paulo')
         )
     `;
     try {
@@ -37,6 +37,7 @@ async function createTable() {
         console.error("Erro ao criar a tabela:", error);
     }
 }
+
 createTable();
 
 // Rota para receber múltiplos dados do frontend
