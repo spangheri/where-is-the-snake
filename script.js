@@ -104,32 +104,14 @@ function nextImage() {
 
 // Função para exibir a tela final
 function mostrarTelaFinal() {
-    const gameImage = document.getElementById("game-image");
-    const timerElement = document.getElementById("timer");
-    const brightnessWarning = document.getElementById("brightness-warning");
-    const gameTitle = document.getElementById("game-title");
-    const gameContainer = document.getElementById("game-container");
+    document.getElementById("game-title").style.display = "none";
+    document.getElementById("brightness-warning").style.display = "none";
+    document.getElementById("timer").style.display = "none";
+    document.getElementById("game-container").style.display = "none";
 
-    // Esconder/remover elementos indesejados
-    if (gameImage) gameImage.style.display = "none";
-    if (timerElement) timerElement.style.display = "none";
-    if (brightnessWarning) brightnessWarning.remove(); // Remove completamente do DOM
-    if (gameTitle) gameTitle.remove(); // Remove completamente do DOM
-
-    // Limpar o conteúdo do gameContainer e adicionar a mensagem final
-    if (gameContainer) {
-        gameContainer.innerHTML = ""; // Limpa tudo dentro do container
-        const message = document.createElement("h2");
-        message.innerText = "Muito obrigado pela participação!";
-        message.style.color = "white"; // Define a cor do texto como branca
-        message.style.textAlign = "center"; // Centraliza o texto
-        message.style.fontSize = "24px"; // Ajusta o tamanho da fonte
-        gameContainer.appendChild(message);
-    } else {
-        console.error("Elemento #game-container não encontrado!");
-    }
+    // Exibe a mensagem final
+    document.getElementById("final-message").style.display = "block";
 }
-
 
 // Função para pedir senha do Admin
 function pedirSenha() {
