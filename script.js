@@ -109,9 +109,13 @@ function mostrarTelaFinal() {
     if (gameContainer) {
         gameContainer.innerHTML = ""; // Limpa tudo dentro do container
         const message = document.createElement("h2");
-        message.innerText = ""; // Mensagem final deixada em branco
+        message.innerText = "Muito obrigado pela participação!";
+        message.style.color = "white"; // Define a cor do texto como branca
+        message.style.textAlign = "center"; // Centraliza o texto
+        message.style.fontSize = "24px"; // Ajusta o tamanho da fonte
         gameContainer.appendChild(message);
     } else {
         console.error("Elemento #game-container não encontrado!");
     }
 }
+
