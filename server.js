@@ -39,22 +39,27 @@ async function createTable() {
 }
 createTable();
 
-// Rota para receber os dados do frontend
+// Rota para receber múltiplos dados do frontend
 app.post("/log", async (req, res) => {
     try {
-        const { image, responseTime } = req.body;
+        const { images } = req.body;
         const ip = req.ip || req.connection.remoteAddress;
         const timestamp = new Date();
 
-        const query = `
-            INSERT INTO game_data (ip, image, response_time, timestamp)
-            VALUES ($1, $2, $3, $4)
-            RETURNING *
-        `;
-        const values = [ip, image, responseTime, timestamp];
+        if (!Array.isArray(images) || images.length === 0) {
+            return res.status(400).json({ success: false, message: "Formato inválido. Esperado um array de imagens." });
+        }
 
-        const result = await pool.query(query, values);
-        res.json({ success: true, data: result.rows[0] });
+        const queries = images.map(({ image, responseTime }) =>
+            pool.query(
+                "INSERT INTO game_data (ip, image, response_time, timestamp) VALUES ($1, $2, $3, $4) RETURNING *",
+                [ip, image, responseTime, timestamp]
+            )
+        );
+
+        const results = await Promise.all(queries);
+        res.json({ success: true, data: results.map(result => result.rows[0]) });
+
     } catch (error) {
         console.error("Erro ao inserir dados:", error);
         res.status(500).json({ success: false, message: "Erro ao salvar os dados" });
