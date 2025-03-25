@@ -42,6 +42,8 @@ createTable();
 // Rota para receber múltiplos dados do frontend
 app.post("/log", async (req, res) => {
     try {
+        console.log("Dados recebidos:", req.body);  // <-- Adicionamos este log para depuração
+
         const { images } = req.body;
         const ip = req.ip || req.connection.remoteAddress;
         const timestamp = new Date();
