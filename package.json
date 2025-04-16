@@ -1,5 +1,11 @@
 {
   "dependencies": {
+<<<<<<< HEAD
+=======
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "json2csv": "^6.0.0-alpha.2",
+>>>>>>> cb9b88cb45470dc73e0f75c4a19bfdaa24030238
     "pg": "^8.14.1"
   }
 }
