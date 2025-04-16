@@ -7,17 +7,29 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1 id="game-title">ENCONTRE A SERPENTE!</h1>
-    <p id="brightness-warning">Aumente o brilho do seu aparelho!</p>
-
-    <!-- Temporizador visual -->
-    <p id="timer">TEMPO RESTANTE: 10 SEGUNDOS</p>
-
-    <div id="game-container">
-        <img id="game-image" src="snake1_0944.JPG" alt="Imagem do jogo">
+    <!-- Tela de consentimento -->
+    <div id="start-screen" style="text-align: center; padding: 30px;">
+        <h2>Olá!</h2>
+        <p>
+            Este jogo pretende avaliar quanto tempo as pessoas demoram para identificar as serpentes camufladas.
+            Para que possamos utilizar as informações coletadas dos jogadores para finalidades científicas,
+            por favor marque as caixas de seleção:
+        </p>
+        <label><input type="checkbox" id="age-checkbox"> Sou maior de 15 anos</label><br><br>
+        <label><input type="checkbox" id="consent-checkbox"> Eu concedo espontaneamente a licença para reprodução dos dados coletados deste jogo para reprodução midiática e em revistas científicas.</label><br><br>
+        <button id="start-button" disabled>Começar o jogo</button>
     </div>
 
-    <!-- Div para a tela final -->
+    <!-- Jogo principal -->
+    <h1 id="game-title" style="display: none;">ENCONTRE A SERPENTE!</h1>
+    <p id="brightness-warning" style="display: none;">Aumente o brilho do seu aparelho!</p>
+    <p id="timer" style="display: none;">TEMPO RESTANTE: 10 SEGUNDOS</p>
+
+    <div id="game-container" style="display: none;">
+        <img id="game-image" src="" alt="Imagem do jogo">
+    </div>
+
+    <!-- Tela final -->
     <div id="final-message" style="display: none;">
         <h2 style="color: white; text-align: center; font-size: 24px;">
             Muito obrigado pela participação!

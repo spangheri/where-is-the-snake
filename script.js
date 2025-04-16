@@ -10,7 +10,7 @@ const images = [
 let currentIndex = 0;
 let timer;
 let isAdmin = false;
-let hasPlayed = localStorage.getItem("hasPlayed") === "true"; // Impede jogadores normais de jogar mais de uma vez
+let hasPlayed = localStorage.getItem("hasPlayed") === "true";
 
 // Coordenadas dos ROIs para cada imagem
 const rois = [
@@ -21,12 +21,11 @@ const rois = [
     { x: 1312, y: 1148, width: 512, height: 540 }  
 ];
 
-// Função para iniciar o timer de 10s
 function startTimer() {
     clearInterval(timer);
     let timeLeft = 10;
-
     const timerElement = document.getElementById("timer");
+
     if (timerElement) {
         timerElement.innerText = `Tempo: ${timeLeft}s`;
     }
@@ -44,50 +43,69 @@ function startTimer() {
     }, 1000);
 }
 
-// Função que verifica se o clique está dentro do ROI
 function isClickInROI(clickX, clickY, roi) {
     return clickX >= roi.x && clickX <= roi.x + roi.width &&
            clickY >= roi.y && clickY <= roi.y + roi.height;
 }
 
-// Função que trata o clique do jogador
 document.addEventListener("DOMContentLoaded", function () {
-    const gameImage = document.getElementById("game-image");
+    // Tela de consentimento
+    const startScreen = document.getElementById("start-screen");
+    const gameElements = [
+        document.getElementById("game-title"),
+        document.getElementById("brightness-warning"),
+        document.getElementById("timer"),
+        document.getElementById("game-container")
+    ];
+    const finalMessage = document.getElementById("final-message");
+    const startButton = document.getElementById("start-button");
+    const ageCheckbox = document.getElementById("age-checkbox");
+    const consentCheckbox = document.getElementById("consent-checkbox");
 
-    if (!gameImage) {
-        console.error("Elemento #game-image não encontrado!");
-        return;
-    }
-
-    // Impede que jogadores normais joguem mais de uma vez
+    // Verifica se já jogou
     if (hasPlayed && !isAdmin) {
-        mostrarTelaFinal();
+        gameElements.forEach(el => el.style.display = "none");
+        startScreen.style.display = "none";
+        finalMessage.style.display = "block";
         return;
     }
 
-    gameImage.addEventListener("click", function (event) {
-        const rect = this.getBoundingClientRect();
-        const scaleX = this.naturalWidth / rect.width;
-        const scaleY = this.naturalHeight / rect.height;
+    // Desabilita botão até marcar os dois checkboxes
+    function updateStartButtonState() {
+        startButton.disabled = !(ageCheckbox.checked && consentCheckbox.checked);
+    }
 
-        const clickX = (event.clientX - rect.left) * scaleX;
-        const clickY = (event.clientY - rect.top) * scaleY;
+    ageCheckbox.addEventListener("change", updateStartButtonState);
+    consentCheckbox.addEventListener("change", updateStartButtonState);
 
-        if (isClickInROI(clickX, clickY, rois[currentIndex])) {
-            alert(`Você encontrou a cobra!`);
-            clearInterval(timer);
-            nextImage();
-        } else {
-            alert("Tente novamente!");
-        }
+    // Quando clicar em "Começar"
+    startButton.addEventListener("click", function () {
+        startScreen.style.display = "none";
+        gameElements.forEach(el => el.style.display = "block");
+
+        const gameImage = document.getElementById("game-image");
+        gameImage.src = images[currentIndex];
+        startTimer();
+
+        gameImage.addEventListener("click", function (event) {
+            const rect = this.getBoundingClientRect();
+            const scaleX = this.naturalWidth / rect.width;
+            const scaleY = this.naturalHeight / rect.height;
+
+            const clickX = (event.clientX - rect.left) * scaleX;
+            const clickY = (event.clientY - rect.top) * scaleY;
+
+            if (isClickInROI(clickX, clickY, rois[currentIndex])) {
+                alert(`Você encontrou a cobra!`);
+                clearInterval(timer);
+                nextImage();
+            } else {
+                alert("Tente novamente!");
+            }
+        });
     });
-
-    // Inicializa o jogo corretamente
-    gameImage.src = images[currentIndex];
-    startTimer();
 });
 
-// Função que muda para a próxima imagem ou exibe a tela final
 function nextImage() {
     if (currentIndex >= images.length - 1) {
         mostrarTelaFinal();
@@ -102,14 +120,16 @@ function nextImage() {
     startTimer();
 }
 
-// Função para exibir a tela final
 function mostrarTelaFinal() {
     document.getElementById("game-title").style.display = "none";
     document.getElementById("brightness-warning").style.display = "none";
     document.getElementById("timer").style.display = "none";
     document.getElementById("game-container").style.display = "none";
 
-    // Exibe a mensagem final
     document.getElementById("final-message").style.display = "block";
-}
 
+    // Salva que o jogador já participou
+    if (!isAdmin) {
+        localStorage.setItem("hasPlayed", "true");
+    }
+}
